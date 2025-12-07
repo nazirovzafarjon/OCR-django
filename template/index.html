@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OCR App</title>
+    {% load static %}
+    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-4 text-center">OCR App</h1>
+
+    <form id="ocrForm" class="flex flex-col gap-4">
+        <input type="file" name="image" id="image" class="border p-2 rounded" required>
+        <button type="submit" class="bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Upload & Extract</button>
+    </form>
+
+    <div id="result" class="mt-4 p-2 border rounded bg-gray-50 hidden">
+        <h2 class="font-semibold mb-2">OCR Result:</h2>
+        <p id="textOutput"></p>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById('ocrForm');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('image');
+    if (!fileInput.files[0]) return alert("Please select a file!");
+
+    const formData = new FormData();
+    formData.append('image', fileInput.files[0]);
+
+    const response = await fetch('/api/ocr/', {
+        method: 'POST',
+        body: formData
+    });
+
+    const data = await response.json();
+    document.getElementById('textOutput').innerText = data.text || data.error;
+    document.getElementById('result').classList.remove('hidden');
+});
+</script>
+
+</body>
+</html>
